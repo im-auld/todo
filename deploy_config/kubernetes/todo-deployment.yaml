@@ -1,0 +1,55 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+  labels:
+    app: todo
+  name: todo
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: todo
+    spec:
+      containers:
+      - name: todo
+        image: imauld/todo:app-0.1.6
+        imagePullPolicy: IfNotPresent
+        command: 
+          - "/vetodo/bin/python"
+        args:
+          - "/app/run.py"
+        ports:
+          - containerPort: 8081
+        env:
+          - name: "AWS_ACCESS_KEY_ID" 
+            value: "foo"
+          - name: "AWS_SECRET_ACCESS_KEY"
+            value: "bar"
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: todo
+spec:
+  ports:
+    - name: grpc
+      port: 8081
+      targetPort: 8081
+  selector:
+    app: todo
+  type: NodePort

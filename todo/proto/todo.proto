@@ -1,0 +1,74 @@
+syntax="proto3";
+
+package todo;
+
+enum Status {
+    TODO = 0;
+    IN_PROGRESS = 1;
+    DONE = 2;
+}
+
+enum ErrorCode {
+    NOT_FOUND = 0;
+    SERVER_ERROR = 1;
+    BAD_REQUEST = 2;
+}
+
+message Todo {
+    int64 id = 1;
+    string title = 2;
+    string description = 3;
+    double createdOn = 4;
+    double dueOn = 5;
+    double completedOn = 6;
+    Status status = 7;
+    int64 assignee = 8;
+}
+
+message AddTodoRequest {
+    Todo todo = 1;
+}
+
+message GetTodoRequest {
+    int64 id = 1;
+    int64 assignee = 2;
+}
+
+message CompleteTodoRequest {
+    int64 id = 1;
+    int64 assignee = 2;
+}
+
+message GetByStatusRequest {
+    Status status = 1;
+    int64 assignee = 2;
+}
+
+message UpdateStatusRequest {
+    int64 id = 1;
+    Status status = 2;
+    int64 assignee = 3;
+}
+
+message EditTodoRequest {
+    Todo todo = 1;
+}
+
+message TodoResponse {
+    Todo todo = 1;
+    ErrorCode error = 2;
+}
+
+message TodoCollectionResponse {
+    repeated Todo todos = 1;
+    ErrorCode error = 2;
+}
+
+service Todos {
+    rpc addTodo(AddTodoRequest) returns (TodoResponse);
+    rpc getTodo(GetTodoRequest) returns (TodoResponse);
+    rpc completeTodo(CompleteTodoRequest) returns(TodoResponse);
+    rpc getTodosByStatus(GetByStatusRequest) returns (TodoCollectionResponse);
+    rpc updateStatus(UpdateStatusRequest) returns (TodoResponse);
+    rpc editTodo(EditTodoRequest) returns (TodoResponse);
+}
